@@ -1,7 +1,15 @@
 name: Deploy Repository Changes
 
 on:
+  # workflow_dispatch:
   push:
+    branches:
+      - dev
+      - stage
+      - prod
+  pull_request:
+    types:
+      - closed
     branches:
       - dev
       - stage
