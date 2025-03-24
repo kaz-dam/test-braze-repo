@@ -1,0 +1,39 @@
+name: Deploy Repository Changes
+
+on:
+  # workflow_dispatch:
+  push:
+    branches:
+      - dev
+      - stage
+      - prod
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
+      - stage
+      - prod
+
+jobs:
+  push-to-braze:
+    name: Push to Braze - ${{ matrix.region }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        region: [emea, apac]
+    environment: ${{ matrix.region }}/${{ github.ref_name }}
+
+    steps:
+      - name: Checkout Code
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Publish to Braze
+        uses: kaz-dam/action-braze-publish@main
+        with:
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          BRAZE_CONTENT_BLOCK_PREFIX: ${{ vars.BRAZE_CONTENT_BLOCK_PREFIX }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRAZE_REST_ENDPOINT: ${{ vars.BRAZE_REST_ENDPOINT }}
+          BRAZE_API_KEY: ${{ secrets.BRAZE_API_KEY }}
